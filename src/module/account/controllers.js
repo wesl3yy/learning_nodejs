@@ -75,4 +75,19 @@ router.put('/update/:username', jwt_token, async (req, res) => {
     }
 });
 
+router.get('/user/:username', jwt_token, async (req, res) => {
+    const userName = req.params.username;
+    const userId = req.user.id;
+    try {
+        const user = await User.findOne({_id: userId, username: userName});
+        if (!user){
+            return res.status(403).json({message: "User not found!"});
+        }
+        return res.status(200).json(user);
+    } catch (error) {
+        return res.status(400).json({message: error.message});        
+    }
+});
+
+
 module.exports = router;
