@@ -2,9 +2,10 @@ require("dotenv").config();
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const moment = require("moment");
+const jwt_token = require("../authenticate/authen");
 const router = express.Router()
 const {User, Type} = require("./models.js");
-
 
 router.post('/register', async (req, res) => {
     const { username, password, type } = req.body;
@@ -45,6 +46,32 @@ router.post('/login', async (req, res) => {
         res.json({token, expires: expiresIn});
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+});
+
+router.put('/update/:username', jwt_token, async (req, res) => {
+    const userName = req.params.username;
+    const {fullname, dob, phone, gender, address} = req.body;
+    const dobValue = moment(dob, 'DD/MM/YYYY').toDate();
+    try {
+        const update = {
+            fullname: fullname,
+            dob: dobValue,
+            phone: phone,
+            gender: gender,
+            address: address
+        }
+        const filter = {
+            username: userName,
+            _id: req.user.id
+        }
+        const updateUser = await User.findOneAndUpdate(filter, update, {new: true});
+        if (!updateUser){
+            return res.status(403).json({message: "Invalid error"})
+        }
+        return res.status(200).send(updateUser);
+    } catch (error) {
+        res.status(500).json({message: error.message});
     }
 });
 
