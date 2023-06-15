@@ -25,6 +25,7 @@
     "dotenv": "^16.1.4",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4",
     "mongoose": "^7.2.2",
     "mongoose-auto-increment": "^3.0.1",
     "nodemon": "^2.0.22"

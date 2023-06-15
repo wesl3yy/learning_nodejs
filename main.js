@@ -1,11 +1,10 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./src/database/db.js');
-// const routes = require('./src/module/account/controllers.js');
 const AccountController = require('./src/module/account/account.controller.js');
-const AccountServices = require('./src/module/account/account.services.js');
-const AccountRepository = require('./src/module/account/account.repository.js');
-const { User } = require('./src/database/model/models.js');
+const {AccountServices, AccountTypeServices} = require('./src/module/account/account.services.js');
+const {AccountRepository, AccountTypeRepository} = require('./src/module/account/account.repository.js');
+const { User, Type } = require('./src/database/model/account.models.js');
 require('dotenv').config();
 
 async function main() {
@@ -17,9 +16,11 @@ async function main() {
     app.disable('x-powered-by');
 
     // TODO: import
-    const accountRepository = new AccountRepository(User)
+    const accountRepository = new AccountRepository(User);
+    const accountTypeRepository = new AccountTypeRepository(Type);
     const accountServices = new AccountServices(accountRepository);
-    app.use('/api/account', AccountController(accountServices));
+    const accountTypeServices = new AccountTypeServices(accountTypeRepository);
+    app.use('/api/account', AccountController(accountServices, accountTypeServices));
 
     app.listen(port, () => {
         console.log(`Server listening on port ${port}`);
