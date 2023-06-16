@@ -30,7 +30,7 @@ const userAccount = mongoose.Schema({
         required: true
     },
     fullname: String,
-    dob: Date,
+    dob: String,
     phone: String,
     gender: String,
     address: String,
