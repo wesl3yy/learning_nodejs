@@ -1,6 +1,7 @@
-const jwt_token = require("../authenticate/authentication");
+const jwt_token = require('./account.middleware');
 const express = require('express');
 const Error = require("../../common/general");
+const configServices = require('../../config');
 
 function AccountController(accountServices, accountTypeServices) {
   const router = express.Router();
@@ -17,27 +18,28 @@ function AccountController(accountServices, accountTypeServices) {
   });
 
   router.post('/login', async (req, res) => {
-    const {username, password, type} = req.body;
+    const { username, password, type } = req.body;
     try {
       const accountType = await accountTypeServices.findType(type);
       const user = await accountServices.findUserAndType(username, accountType._id);
-      if (user.message == Error.NotFound){
+      if (user.message == Error.NotFound) {
         return res.status(400).json(user);
       }
-      const expiresIn = "365d";
+      const expiresIn = configServices.getJWTConfig().expiresIn;
       const token = await accountServices.login(user, password, expiresIn);
-      if (token.message == Error.WrongPassword){
+      if (token.message == Error.WrongPassword) {
         return res.status(403).json(token);
       }
       return res.status(200).json(token);
     } catch (error) {
-      return res.status(400).json({message: error.message})
+      return res.status(400).json({ message: error.message })
     }
   });
 
-  router.put('/update/:username', jwt_token, async (req, res) => {
+  router.use(jwt_token);
+  router.put('/update/:username', async (req, res) => {
     const username = req.params.username;
-    const {fullname, dob, phone, gender, address} = req.body;
+    const { fullname, dob, phone, gender, address } = req.body;
     try {
       const update = {
         fullname: fullname,
@@ -50,18 +52,18 @@ function AccountController(accountServices, accountTypeServices) {
         username: username,
         _id: req.user.id
       }
-      const options = {new: true, select: '-password'};
+      const options = { new: true, select: '-password' };
       const updateUser = await accountServices.findUserAndUpdate(update, filter, options);
       if (updateUser.message == Error.NotFound) {
         return res.status(403).json(updateUser);
       }
       return res.status(200).send(updateUser);
     } catch (error) {
-      return res.status(400).json({message: error.message})
+      return res.status(400).json({ message: error.message })
     }
   });
 
-  router.get('/user/:username', jwt_token, async (req, res) => {
+  router.get('/user/:username', async (req, res) => {
     const username = req.params.username;
     const userId = req.user.id;
     try {
@@ -71,7 +73,7 @@ function AccountController(accountServices, accountTypeServices) {
       }
       return res.status(200).json(user);
     } catch (error) {
-      return res.status(400).json({message: error.message})
+      return res.status(400).json({ message: error.message })
     }
   });
 
