@@ -1,3 +1,6 @@
+const { GeneralError, GeneralMessage } = require("../common/general");
+
+
 class MailServices {
   constructor(configServices, nodeMailer) {
     this.configServices = configServices;
