@@ -1,16 +1,23 @@
 require("dotenv").config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { GeneralError } = require("../../common/general");
+const { GeneralError, GeneralMessage } = require("../../common/general");
+const ConfigServices = require("../../config");
+const NodeMailer = require("nodemailer");
+const configServices = require("../../config");
+
 
 class AccountServices {
   constructor(accountRepository) {
     this.accountRepository = accountRepository;
   }
 
-  async create(username, password) {
+  async create(username, password, email) {
     const hashPassword = await bcrypt.hash(password, 10);
-    const user = await this.accountRepository.create(username, hashPassword);
+    const user = await this.accountRepository.create(username, hashPassword, email);
+    if (!user) {
+      return { message: GeneralError.VerifyAccountError }
+    }
     return user;
   }
 
@@ -27,7 +34,7 @@ class AccountServices {
     if(!isPasswordValid) {
       return {message: GeneralError.WrongPassword};
     }
-    const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn});
+    const token = jwt.sign({id: user._id}, ConfigServices.getJWTConfig().jwtSecret, {expiresIn});
     return {token: token, expires_in: expiresIn};
   }
 
@@ -48,4 +55,50 @@ class AccountServices {
   }
 }
 
-module.exports = {AccountServices, };
+
+class UserTokenService {
+  constructor(userTokenRepository) {
+    this.userTokenRepository = userTokenRepository;
+  }
+
+  async create(userId) {
+    const token = await this.get_token(userId);
+    const userToken = await this.userTokenRepository.create(userId, token);
+    if (!userToken) {
+      return { message: GeneralError.VerifyAccountError };
+    }
+    return userToken;
+  }
+
+  async get_token(userId) {
+    const secretKey = ConfigServices.getJWTConfig().jwtSecret;
+    const expiresIn = ConfigServices.getJWTConfig().expiresIn;
+    const payload = { userId, type: 'verification' };
+    const userToken = jwt.sign(payload, secretKey, { expiresIn });
+    return userToken;
+  }
+
+  async send_email(userToken, email) {
+    const emailService = ConfigServices.getEmailService();
+    const emailAuth = ConfigServices.getEmailAuth();
+    const transporter = NodeMailer.createTransport({
+      service: emailService,
+      auth: emailAuth
+    });
+    const mailOptions = {
+      from: configServices.getEmailAuth().user,
+      to: email,
+      subject: 'Verification Token',
+      text: `Please use this token below to active your account:\n${userToken}\n`,
+    };
+    transporter.sendMail(mailOptions, (error) => {
+      if (error) {
+        return { message: GeneralError.EmailSentError}
+      } else {
+        return { message: GeneralMessage.EmailSent }
+      }
+    }
+  )};
+}
+
+module.exports = {AccountServices, UserTokenService};

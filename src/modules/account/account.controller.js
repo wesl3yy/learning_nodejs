@@ -3,14 +3,23 @@ const express = require('express');
 const { GeneralError, GeneralMessage } = require("../../common/general");
 const configServices = require('../../config');
 
-function AccountController(accountServices) {
+function AccountController(accountServices, userTokenService) {
   const router = express.Router();
 
   router.post('/register', async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
     try {
-      const account = await accountServices.create(username, password);
-      return res.status(200).json(account);
+      const account = await accountServices.create(username, password, email);
+      if (account.message == GeneralError.VerifyAccountError){
+        return res.status(400).json({ message: GeneralError.VerifyAccountError});
+      }
+      const accountToken = await userTokenService.create(account._id);
+      if (accountToken.message == GeneralError.VerifyAccountError){
+        return res.status(400).json({ message: GeneralError.InvalidError});
+      } else {
+        const send_email = await userTokenService.send_email(accountToken.token, account.email);
+      }
+      return res.status(200).json({ message: GeneralMessage.EmailSent });
     } catch (err) {
       return res.status(400).json({ message: err.message });
     }

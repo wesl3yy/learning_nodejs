@@ -27,6 +27,17 @@ class ConfigServices {
       expiresIn: this.getString('EXPIRES_IN')
     }
   }
+
+  getEmailService() {
+    return this.getString('EMAIL_SERVICE');
+  }
+
+  getEmailAuth() {
+    return {
+      user: this.getString("EMAIL_USER"),
+      pass: this.getString("EMAIL_PASSWORD")
+    }
+  }
 }
 
 const configServices = new ConfigServices(process.env);
