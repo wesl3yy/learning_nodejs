@@ -1,9 +1,7 @@
 require("dotenv").config();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { GeneralError, GeneralMessage } = require("../../common/general");
-const ConfigServices = require("../../config");
-const NodeMailer = require("nodemailer");
+const { GeneralError } = require("../../common/general");
 const configServices = require("../../config");
 
 
@@ -34,7 +32,7 @@ class AccountServices {
     if (!isPasswordValid) {
       return { message: GeneralError.WrongPassword };
     }
-    const token = jwt.sign({ id: user._id }, ConfigServices.getJWTConfig().jwtSecret, { expiresIn });
+    const token = jwt.sign({ id: user._id }, configServices.getJWTConfig().jwtSecret, { expiresIn });
     return { token: token, expires_in: expiresIn };
   }
 
@@ -63,7 +61,7 @@ class UserTokenService {
   }
 
   async create(userId) {
-    const token = await this.get_token(userId);
+    const token = await this.getToken(userId);
     const userToken = await this.userTokenRepository.create(userId, token);
     if (!userToken) {
       return { message: GeneralError.VerifyAccountError };
@@ -71,15 +69,15 @@ class UserTokenService {
     return userToken;
   }
 
-  async get_token(userId) {
-    const secretKey = ConfigServices.getJWTConfig().jwtSecret;
-    const expiresIn = ConfigServices.getJWTConfig().expiresIn;
+  async getToken(userId) {
+    const secretKey = configServices.getJWTConfig().jwtSecret;
+    const expiresIn = configServices.getJWTConfig().expiresIn;
     const payload = { userId, type: 'verification' };
     const userToken = jwt.sign(payload, secretKey, { expiresIn });
     return userToken;
   }
 
-  async send_email(userToken, email) {
+  async sendEmail(userToken, email) {
     try {
       const subject = 'Verification Token';
       const text = `Please use this token below to active your account:\n${userToken}\n`;

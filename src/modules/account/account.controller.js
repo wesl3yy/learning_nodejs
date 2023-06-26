@@ -14,11 +14,10 @@ function AccountController(accountServices, userTokenService) {
         return res.status(400).json({ message: GeneralError.VerifyAccountError});
       }
       const accountToken = await userTokenService.create(account._id);
-      console.log(accountToken, 'token');
       if (accountToken.message == GeneralError.VerifyAccountError){
         return res.status(400).json({ message: GeneralError.InvalidError});
       } else {
-        const send_email = await userTokenService.send_email(accountToken.token, account.email);
+        const send_email = await userTokenService.sendEmail(accountToken.token, account.email);
       }
       return res.status(200).json({ message: GeneralMessage.EmailSent });
     } catch (err) {
@@ -45,7 +44,7 @@ function AccountController(accountServices, userTokenService) {
   });
 
   router.use(jwt_token);
-  router.put('/user/update/:username', async (req, res) => {
+  router.put('/user/:username', async (req, res) => {
     const username = req.params.username;
     const { fullname, dob, phone, gender, address } = req.body;
     try {
