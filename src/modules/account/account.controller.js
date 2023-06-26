@@ -14,6 +14,7 @@ function AccountController(accountServices, userTokenService) {
         return res.status(400).json({ message: GeneralError.VerifyAccountError});
       }
       const accountToken = await userTokenService.create(account._id);
+      console.log(accountToken, 'token');
       if (accountToken.message == GeneralError.VerifyAccountError){
         return res.status(400).json({ message: GeneralError.InvalidError});
       } else {
