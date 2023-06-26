@@ -1,8 +1,13 @@
-const error = {
+const GeneralError = {
     NotFound: "User not found!",
     WrongPassword: "Wrong password!",
-    NotFoundType: "Account type not found!"
+    SamePassword: "New password is old password, please type another password.",
+    NotALikePassword: "Password and confirm password is not match, please type password or confirm password again."
 };
 
-module.exports = error;
+const GeneralMessage = {
+    ChangePasswordSuccess: "Change password successful."
+}
+
+module.exports = { GeneralError, GeneralMessage };
 
