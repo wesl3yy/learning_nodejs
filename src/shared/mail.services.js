@@ -16,7 +16,7 @@ class MailServices {
       subject,
       text
     };
-    transporter.sendMail(mailOptions, (error) => {
+    this.nodeMailer.sendMail(mailOptions, (error) => {
       if (error) {
         return { message: GeneralError.EmailSentError };
       }
