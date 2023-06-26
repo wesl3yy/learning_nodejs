@@ -2,14 +2,14 @@ const { GeneralError, GeneralMessage } = require("../common/general");
 
 
 class MailServices {
-  constructor(configServices, NodeMailer) {
+  constructor(configServices, nodeMailer) {
     this.configServices = configServices;
     const { service, user, pass } = configServices.getEmailConfig();
-    const transporter = NodeMailer.createTransport({
+    const transporter = nodeMailer.createTransport({
       service,
       auth: { user, pass }
     });
-    this.transporter = transporter;
+    this.nodeMailer = transporter;
   }
 
   async send(to, subject, text) {
@@ -19,7 +19,7 @@ class MailServices {
       subject,
       text
     };
-    this.transporter.sendMail(mailOptions, (error) => {
+    this.nodeMailer.sendMail(mailOptions, (error) => {
       if (error) {
         return { message: GeneralError.EmailSentError };
       }
