@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const AccountController = require('./modules/account/account.controller.js');
-const { AccountServices, AccountTypeServices } = require('./modules/account/account.services.js');
-const { AccountRepository, AccountTypeRepository } = require('./modules/account/account.repository.js');
-const { User, Type } = require('./database/model/account.models.js');
+const { AccountServices, } = require('./modules/account/account.services.js');
+const { AccountRepository, } = require('./modules/account/account.repository.js');
+const { User, } = require('./database/model/account.models.js');
 const configServices = require('./config.js');
 const MongoConnect = require('./database/db.js');
 
@@ -25,10 +25,8 @@ async function main() {
 
     // INFO: import
     const accountRepository = new AccountRepository(User);
-    const accountTypeRepository = new AccountTypeRepository(Type);
     const accountServices = new AccountServices(accountRepository);
-    const accountTypeServices = new AccountTypeServices(accountTypeRepository);
-    app.use('/api/account', AccountController(accountServices, accountTypeServices));
+    app.use('/api/account', AccountController(accountServices,));
 
     const port = configServices.getPORT();
     app.listen(port, () => {

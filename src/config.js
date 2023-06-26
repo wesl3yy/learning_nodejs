@@ -1,3 +1,5 @@
+require("dotenv").config({path: "../.env"});
+
 class ConfigServices {
   constructor(env) {
     this.env = env;

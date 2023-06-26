@@ -1,16 +1,15 @@
 const jwt_token = require('./account.middleware');
 const express = require('express');
-const Error = require("../../common/general");
+const { GeneralError, GeneralMessage } = require("../../common/general");
 const configServices = require('../../config');
 
-function AccountController(accountServices, accountTypeServices) {
+function AccountController(accountServices) {
   const router = express.Router();
 
   router.post('/register', async (req, res) => {
-    const { username, password, type } = req.body;
+    const { username, password } = req.body;
     try {
-      const accountType = await accountTypeServices.findType(type);
-      const account = await accountServices.create(username, password, accountType._id);
+      const account = await accountServices.create(username, password);
       return res.status(200).json(account);
     } catch (err) {
       return res.status(400).json({ message: err.message });
@@ -18,16 +17,15 @@ function AccountController(accountServices, accountTypeServices) {
   });
 
   router.post('/login', async (req, res) => {
-    const { username, password, type } = req.body;
+    const { username, password } = req.body;
     try {
-      const accountType = await accountTypeServices.findType(type);
-      const user = await accountServices.findUserAndType(username, accountType._id);
-      if (user.message == Error.NotFound) {
+      const user = await accountServices.findOne(username);
+      if (user.message == GeneralError.NotFound) {
         return res.status(400).json(user);
       }
       const expiresIn = configServices.getJWTConfig().expiresIn;
       const token = await accountServices.login(user, password, expiresIn);
-      if (token.message == Error.WrongPassword) {
+      if (token.message == GeneralError.WrongPassword) {
         return res.status(403).json(token);
       }
       return res.status(200).json(token);
@@ -37,7 +35,7 @@ function AccountController(accountServices, accountTypeServices) {
   });
 
   router.use(jwt_token);
-  router.put('/update/:username', async (req, res) => {
+  router.put('/user/update/:username', async (req, res) => {
     const username = req.params.username;
     const { fullname, dob, phone, gender, address } = req.body;
     try {
@@ -53,7 +51,7 @@ function AccountController(accountServices, accountTypeServices) {
         _id: req.user.id
       }
       const options = { new: true, select: '-password' };
-      const updateUser = await accountServices.findUserAndUpdate(update, filter, options);
+      const updateUser = await accountServices.findUserAndUpdate(filter, update, options);
       if (updateUser.message == Error.NotFound) {
         return res.status(403).json(updateUser);
       }
@@ -63,17 +61,47 @@ function AccountController(accountServices, accountTypeServices) {
     }
   });
 
+  router.use(jwt_token);
   router.get('/user/:username', async (req, res) => {
     const username = req.params.username;
-    const userId = req.user.id;
     try {
-      const user = await accountServices.findUserByName(userId, username);
-      if (user.message == Error.NotFound) {
+      const user = await accountServices.findOne(username);
+      if (user.message == GeneralError.NotFound) {
         return res.status(400).json(user);
       }
       return res.status(200).json(user);
     } catch (error) {
       return res.status(400).json({ message: error.message })
+    }
+  });
+
+  router.use(jwt_token);
+  router.put('/user/reset_password/:username', async (req, res) => {
+    const username = req.params.username;
+    try {
+      const { password, confirm_password } = req.body;
+      const user = await accountServices.findOne(username);
+      if (user.message == GeneralError.NotFound) {
+        return res.status(400).json(user);
+      }
+      const passwordMatch = await accountServices.compare(password, user.password);
+      if (passwordMatch) {
+        return res.status(400).json({ message: passwordMatch.message })
+      }
+      if (password == confirm_password) {
+        const update = password;
+        const filter = {
+          username: username,
+          _id: req.user.id
+        }
+        const options = { new : false }
+        const updateUser = await accountServices.findUserAndUpdate(filter, update, options);
+        return res.status(201).json({ message: GeneralMessage.ChangePasswordSuccess });
+      } else {
+        return res.status(400).json({ message: GeneralError.NotALikePassword });
+      }
+    } catch (error) {
+      return res.status(400).json({ message: error.message });
     }
   });
 
