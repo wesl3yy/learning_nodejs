@@ -6,6 +6,8 @@ const { AccountRepository, UserTokenRepository} = require('./modules/account/acc
 const { User, UserToken } = require('./database/model/account.models.js');
 const configServices = require('./config.js');
 const MongoConnect = require('./database/db.js');
+const MailServices = require('./shared/mail.services.js');
+const NodeMailer = require("nodemailer");
 
 async function main() {
     // INFO: connect database
@@ -23,11 +25,13 @@ async function main() {
     app.use(cors());
     app.disable('x-powered-by');
 
+    // INFO: import mail services
+    const mailServices = new MailServices(configServices, NodeMailer);
     // INFO: import
     const accountRepository = new AccountRepository(User);
     const userTokenRepository = new UserTokenRepository(UserToken);
     const accountServices = new AccountServices(accountRepository);
-    const userTokenService = new UserTokenService(userTokenRepository);
+    const userTokenService = new UserTokenService(userTokenRepository, mailServices);
     app.use('/api/account', AccountController(accountServices, userTokenService));
 
     const port = configServices.getPORT();

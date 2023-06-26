@@ -1,4 +1,4 @@
-require("dotenv").config({path: "../.env"});
+require("dotenv").config({ path: "../.env" });
 
 class ConfigServices {
   constructor(env) {
@@ -28,14 +28,11 @@ class ConfigServices {
     }
   }
 
-  getEmailService() {
-    return this.getString('EMAIL_SERVICE');
-  }
-
-  getEmailAuth() {
+  getEmailConfig() {
     return {
       user: this.getString("EMAIL_USER"),
-      pass: this.getString("EMAIL_PASSWORD")
+      pass: this.getString("EMAIL_PASSWORD"),
+      service: this.getString('EMAIL_SERVICE')
     }
   }
 }

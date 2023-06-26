@@ -31,17 +31,17 @@ class AccountServices {
 
   async login(user, password, expiresIn) {
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    if(!isPasswordValid) {
-      return {message: GeneralError.WrongPassword};
+    if (!isPasswordValid) {
+      return { message: GeneralError.WrongPassword };
     }
-    const token = jwt.sign({id: user._id}, ConfigServices.getJWTConfig().jwtSecret, {expiresIn});
-    return {token: token, expires_in: expiresIn};
+    const token = jwt.sign({ id: user._id }, ConfigServices.getJWTConfig().jwtSecret, { expiresIn });
+    return { token: token, expires_in: expiresIn };
   }
 
   async findUserAndUpdate(filter, user, options) {
     const userUpdate = await this.accountRepository.findUserAndUpdate(filter, user, options);
     if (!userUpdate) {
-      return {message: GeneralError.NotFound};
+      return { message: GeneralError.NotFound };
     }
     return userUpdate;
   }
@@ -49,7 +49,7 @@ class AccountServices {
   async compare(password, hashPassword) {
     const comparePassword = await bcrypt.compare(password, hashPassword);
     if (comparePassword) {
-      return {message: GeneralError.SamePassword}
+      return { message: GeneralError.SamePassword }
     }
     return comparePassword;
   }
@@ -57,8 +57,9 @@ class AccountServices {
 
 
 class UserTokenService {
-  constructor(userTokenRepository) {
+  constructor(userTokenRepository, mailServices) {
     this.userTokenRepository = userTokenRepository;
+    this.mailServices = mailServices;
   }
 
   async create(userId) {
@@ -79,26 +80,15 @@ class UserTokenService {
   }
 
   async send_email(userToken, email) {
-    const emailService = ConfigServices.getEmailService();
-    const emailAuth = ConfigServices.getEmailAuth();
-    const transporter = NodeMailer.createTransport({
-      service: emailService,
-      auth: emailAuth
-    });
-    const mailOptions = {
-      from: configServices.getEmailAuth().user,
-      to: email,
-      subject: 'Verification Token',
-      text: `Please use this token below to active your account:\n${userToken}\n`,
-    };
-    transporter.sendMail(mailOptions, (error) => {
-      if (error) {
-        return { message: GeneralError.EmailSentError}
-      } else {
-        return { message: GeneralMessage.EmailSent }
-      }
+    try {
+      const subject = 'Verification Token';
+      const text = `Please use this token below to active your account:\n${userToken}\n`;
+      await this.mailServices.send(email, subject, text);
+      return true;
+    } catch {
+      return false;
     }
-  )};
+  };
 }
 
-module.exports = {AccountServices, UserTokenService};
+module.exports = { AccountServices, UserTokenService };
