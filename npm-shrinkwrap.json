@@ -18,6 +18,7 @@
         "moment": "^2.29.4",
         "mongoose": "^7.2.2",
         "mongoose-auto-increment": "^3.0.1",
+        "nodemailer": "^6.9.3",
         "nodemon": "^1.19.4"
       }
     },
@@ -2424,6 +2425,14 @@
       "dependencies": {
         "tr46": "~0.0.3",
         "webidl-conversions": "^3.0.0"
+      }
+    },
+    "node_modules/nodemailer": {
+      "version": "6.9.3",
+      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.3.tgz",
+      "integrity": "sha512-fy9v3NgTzBngrMFkDsKEj0r02U7jm6XfC3b52eoNV+GCrGj+s8pt5OqhiJdWKuw51zCTdiNR/IUD1z33LIIGpg==",
+      "engines": {
+        "node": ">=6.0.0"
       }
     },
     "node_modules/nodemon": {
@@ -5768,6 +5777,11 @@
           }
         }
       }
+    },
+    "nodemailer": {
+      "version": "6.9.3",
+      "resolved": "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.3.tgz",
+      "integrity": "sha512-fy9v3NgTzBngrMFkDsKEj0r02U7jm6XfC3b52eoNV+GCrGj+s8pt5OqhiJdWKuw51zCTdiNR/IUD1z33LIIGpg=="
     },
     "nodemon": {
       "version": "1.19.4",

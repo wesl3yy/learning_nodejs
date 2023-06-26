@@ -3,10 +3,11 @@ class AccountRepository {
     this.user = user;
   }
 
-  async create(username, password) {
+  async create(username, password, email) {
     const userModel = new this.user({
       username: username,
-      password,
+      password: password,
+      email: email
     })
     const doc = await userModel.save();
     return doc;
@@ -24,4 +25,19 @@ class AccountRepository {
 
 }
 
-module.exports = {AccountRepository,};
+class UserTokenRepository {
+  constructor(userToken) {
+    this.userToken = userToken;
+  }
+
+  async create(userId, token) {
+    const userTokenModel = new this.userToken({
+      token: token,
+      user_id: userId
+    })
+    const doc = await userTokenModel.save();
+    return doc;
+  }
+}
+
+module.exports = {AccountRepository, UserTokenRepository};
