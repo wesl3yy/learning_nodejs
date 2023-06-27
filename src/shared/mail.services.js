@@ -1,4 +1,4 @@
-class MailServices {
+export class MailServices {
   constructor(configServices, nodeMailer) {
     this.configServices = configServices;
     const { service, user, pass } = configServices.getEmailConfig();
@@ -24,5 +24,3 @@ class MailServices {
     })
   }
 }
-
-module.exports = MailServices;

@@ -1,22 +1,21 @@
-const jwt_token = require('./account.middleware');
-const express = require('express');
-const { GeneralError, GeneralMessage } = require("../../common/general");
-const configServices = require('../../config');
+import express from 'express';
+// import jwt_token from './account.middleware';
+import { GeneralError, GeneralMessage } from '../../common/general';
 
-function AccountController(accountServices, userTokenService) {
+export function AccountController(configServices, accountServices, userTokenService) {
   const router = express.Router();
 
   router.post('/register', async (req, res) => {
     const { username, password, email } = req.body;
     try {
       const account = await accountServices.create(username, password, email);
-      if (account.message == GeneralError.VerifyAccountError){
-        return res.status(400).json({ message: GeneralError.VerifyAccountError});
+      if (account.message == GeneralError.VerifyAccountError) {
+        return res.status(400).json({ message: GeneralError.VerifyAccountError });
       }
       const accountToken = await userTokenService.create(account._id);
       console.log(accountToken, 'token');
-      if (accountToken.message == GeneralError.VerifyAccountError){
-        return res.status(400).json({ message: GeneralError.InvalidError});
+      if (accountToken.message == GeneralError.VerifyAccountError) {
+        return res.status(400).json({ message: GeneralError.InvalidError });
       } else {
         const send_email = await userTokenService.send_email(accountToken.token, account.email);
       }
@@ -44,7 +43,7 @@ function AccountController(accountServices, userTokenService) {
     }
   });
 
-  router.use(jwt_token);
+  // router.use(jwt_token);
   router.put('/user/update/:username', async (req, res) => {
     const username = req.params.username;
     const { fullname, dob, phone, gender, address } = req.body;
@@ -71,7 +70,6 @@ function AccountController(accountServices, userTokenService) {
     }
   });
 
-  router.use(jwt_token);
   router.get('/user/:username', async (req, res) => {
     const username = req.params.username;
     try {
@@ -85,7 +83,6 @@ function AccountController(accountServices, userTokenService) {
     }
   });
 
-  router.use(jwt_token);
   router.put('/user/reset_password/:username', async (req, res) => {
     const username = req.params.username;
     try {
@@ -104,7 +101,7 @@ function AccountController(accountServices, userTokenService) {
           username: username,
           _id: req.user.id
         }
-        const options = { new : false }
+        const options = { new: false }
         const updateUser = await accountServices.findUserAndUpdate(filter, update, options);
         return res.status(201).json({ message: GeneralMessage.ChangePasswordSuccess });
       } else {
@@ -117,5 +114,3 @@ function AccountController(accountServices, userTokenService) {
 
   return router;
 }
-
-module.exports = AccountController;

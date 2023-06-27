@@ -1,14 +1,11 @@
-require("dotenv").config();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-const { GeneralError, GeneralMessage } = require("../../common/general");
-const ConfigServices = require("../../config");
-const NodeMailer = require("nodemailer");
-const configServices = require("../../config");
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import NodeMailer from 'nodemailer';
+import { GeneralError, GeneralMessage } from '../../common/general';
 
-
-class AccountServices {
-  constructor(accountRepository) {
+export class AccountServices {
+  constructor(configServices, accountRepository) {
+    this.configServices = configServices;
     this.accountRepository = accountRepository;
   }
 
@@ -34,7 +31,7 @@ class AccountServices {
     if (!isPasswordValid) {
       return { message: GeneralError.WrongPassword };
     }
-    const token = jwt.sign({ id: user._id }, ConfigServices.getJWTConfig().jwtSecret, { expiresIn });
+    const token = jwt.sign({ id: user._id }, this.configServices.getJWTConfig().jwtSecret, { expiresIn });
     return { token: token, expires_in: expiresIn };
   }
 
@@ -56,10 +53,11 @@ class AccountServices {
 }
 
 
-class UserTokenService {
-  constructor(userTokenRepository, mailServices) {
+export class UserTokenService {
+  constructor(userTokenRepository, mailServices, configServices) {
     this.userTokenRepository = userTokenRepository;
     this.mailServices = mailServices;
+    this.configServices = configServices;
   }
 
   async create(userId) {
@@ -72,8 +70,8 @@ class UserTokenService {
   }
 
   async get_token(userId) {
-    const secretKey = ConfigServices.getJWTConfig().jwtSecret;
-    const expiresIn = ConfigServices.getJWTConfig().expiresIn;
+    const secretKey = this.configServices.getJWTConfig().jwtSecret;
+    const expiresIn = this.configServices.getJWTConfig().expiresIn;
     const payload = { userId, type: 'verification' };
     const userToken = jwt.sign(payload, secretKey, { expiresIn });
     return userToken;
@@ -91,4 +89,3 @@ class UserTokenService {
   };
 }
 
-module.exports = { AccountServices, UserTokenService };

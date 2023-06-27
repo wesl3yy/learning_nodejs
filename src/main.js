@@ -1,17 +1,23 @@
-const express = require('express');
-const cors = require('cors');
-const AccountController = require('./modules/account/account.controller.js');
-const { AccountServices, UserTokenService} = require('./modules/account/account.services.js');
-const { AccountRepository, UserTokenRepository} = require('./modules/account/account.repository.js');
-const { User, UserToken } = require('./database/model/account.models.js');
-const configServices = require('./config.js');
-const MongoConnect = require('./database/db.js');
-const MailServices = require('./shared/mail.services.js');
-const NodeMailer = require("nodemailer");
+import express from 'express';
+import cors from 'cors';
+import NodeMailer from 'nodemailer';
+import { mongoConnect } from './database/db';
+import { MailServices } from './shared/mail.services';
+import { config } from 'dotenv';
+import { ConfigServices } from './config';
+import { AccountRepository } from './modules/account/account.repository';
+import { AccountServices } from './modules/account/account.services';
+import { AccountController } from './modules/account/account.controller';
+import { UserTokenRepository } from './modules/account/account.repository';
+import { UserTokenService } from './modules/account/account.services';
+import { User } from './database/model/account.models';
+import { UserToken } from './database/model/account.models';
 
 async function main() {
+    config();
+    const configServices = new ConfigServices(process.env);
     // INFO: connect database
-    const database = MongoConnect(configServices.getMongoURI())
+    const database = mongoConnect(configServices.getMongoURI())
     database.on('error', (error) => {
         console.log(error)
     })
@@ -30,9 +36,9 @@ async function main() {
     // INFO: import
     const accountRepository = new AccountRepository(User);
     const userTokenRepository = new UserTokenRepository(UserToken);
-    const accountServices = new AccountServices(accountRepository);
-    const userTokenService = new UserTokenService(userTokenRepository, mailServices);
-    app.use('/api/account', AccountController(accountServices, userTokenService));
+    const accountServices = new AccountServices(configServices, accountRepository);
+    const userTokenService = new UserTokenService(userTokenRepository, mailServices, configServices);
+    app.use('/api/account', AccountController(configServices, accountServices, userTokenService));
 
     const port = configServices.getPORT();
     app.listen(port, () => {
