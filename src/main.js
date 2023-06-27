@@ -4,7 +4,7 @@ import NodeMailer from 'nodemailer';
 import { mongoConnect } from './database/db';
 import { MailServices } from './shared/mail.services';
 import { config } from 'dotenv';
-import { ConfigServices } from './config';
+import { configServices } from './config';
 import { AccountRepository } from './modules/account/account.repository';
 import { AccountServices } from './modules/account/account.services';
 import { AccountController } from './modules/account/account.controller';
@@ -15,7 +15,6 @@ import { UserToken } from './database/model/account.models';
 
 async function main() {
     config();
-    const configServices = new ConfigServices(process.env);
     // INFO: connect database
     const database = mongoConnect(configServices.getMongoURI())
     database.on('error', (error) => {
@@ -36,9 +35,9 @@ async function main() {
     // INFO: import
     const accountRepository = new AccountRepository(User);
     const userTokenRepository = new UserTokenRepository(UserToken);
-    const accountServices = new AccountServices(configServices, accountRepository);
-    const userTokenService = new UserTokenService(userTokenRepository, mailServices, configServices);
-    app.use('/api/account', AccountController(configServices, accountServices, userTokenService));
+    const accountServices = new AccountServices(accountRepository);
+    const userTokenService = new UserTokenService(userTokenRepository, mailServices);
+    app.use('/api/account', AccountController(accountServices, userTokenService));
 
     const port = configServices.getPORT();
     app.listen(port, () => {

@@ -1,8 +1,14 @@
 import express from 'express';
-// import jwt_token from './account.middleware';
+import { authMiddleware } from './account.middleware';
+import { configServices } from '../../config';
 import { GeneralError, GeneralMessage } from '../../common/general';
+import { AccountServices, UserTokenService } from './account.services';
 
-export function AccountController(configServices, accountServices, userTokenService) {
+/**
+ * @param {AccountServices} accountServices 
+ * @param {UserTokenService} userTokenService 
+ */
+export function AccountController(accountServices, userTokenService) {
   const router = express.Router();
 
   router.post('/register', async (req, res) => {
@@ -13,11 +19,10 @@ export function AccountController(configServices, accountServices, userTokenServ
         return res.status(400).json({ message: GeneralError.VerifyAccountError });
       }
       const accountToken = await userTokenService.create(account._id);
-      console.log(accountToken, 'token');
-      if (accountToken.message == GeneralError.VerifyAccountError) {
-        return res.status(400).json({ message: GeneralError.InvalidError });
+      if (accountToken.message == GeneralError.VerifyAccountError){
+        return res.status(400).json({ message: GeneralError.InvalidError});
       } else {
-        const send_email = await userTokenService.send_email(accountToken.token, account.email);
+        const send_email = await userTokenService.sendEmail(accountToken.token, account.email);
       }
       return res.status(200).json({ message: GeneralMessage.EmailSent });
     } catch (err) {
@@ -43,8 +48,8 @@ export function AccountController(configServices, accountServices, userTokenServ
     }
   });
 
-  // router.use(jwt_token);
-  router.put('/user/update/:username', async (req, res) => {
+  router.use(authMiddleware);
+  router.put('/user/:username', async (req, res) => {
     const username = req.params.username;
     const { fullname, dob, phone, gender, address } = req.body;
     try {

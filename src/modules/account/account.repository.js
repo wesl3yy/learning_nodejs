@@ -10,7 +10,7 @@ export class AccountRepository {
       email: email
     })
     const doc = await userModel.save();
-    return doc;
+    return doc
   }
 
   async findOne(username) {

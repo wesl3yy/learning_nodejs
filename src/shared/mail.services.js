@@ -1,3 +1,5 @@
+import { GeneralError, GeneralMessage } from "../common/general";
+
 export class MailServices {
   constructor(configServices, nodeMailer) {
     this.configServices = configServices;

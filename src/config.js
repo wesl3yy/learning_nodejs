@@ -1,4 +1,4 @@
-export class ConfigServices {
+class ConfigServices {
   constructor(env) {
     this.env = env;
   }
@@ -35,4 +35,5 @@ export class ConfigServices {
   }
 }
 
+export const configServices = new ConfigServices(process.env);
 

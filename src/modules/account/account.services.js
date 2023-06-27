@@ -1,16 +1,18 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import NodeMailer from 'nodemailer';
-import { GeneralError, GeneralMessage } from '../../common/general';
+import { bcryptServices } from '../../shared/bcrypt.services';
+import { jwtServices } from '../../shared/jwt.services';
+import { GeneralError } from '../../common/general';
+import { AccountRepository } from './account.repository';
 
 export class AccountServices {
-  constructor(configServices, accountRepository) {
-    this.configServices = configServices;
+  /**
+   * @param {AccountRepository} accountRepository 
+   */
+  constructor(accountRepository) {
     this.accountRepository = accountRepository;
   }
 
   async create(username, password, email) {
-    const hashPassword = await bcrypt.hash(password, 10);
+    const hashPassword = await bcryptServices.hashPassword(password);
     const user = await this.accountRepository.create(username, hashPassword, email);
     if (!user) {
       return { message: GeneralError.VerifyAccountError }
@@ -27,11 +29,11 @@ export class AccountServices {
   }
 
   async login(user, password, expiresIn) {
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcryptServices.compare(password, user.password);
     if (!isPasswordValid) {
       return { message: GeneralError.WrongPassword };
     }
-    const token = jwt.sign({ id: user._id }, this.configServices.getJWTConfig().jwtSecret, { expiresIn });
+    const token = jwtServices.encode({ id: user._id });
     return { token: token, expires_in: expiresIn };
   }
 
@@ -54,14 +56,16 @@ export class AccountServices {
 
 
 export class UserTokenService {
-  constructor(userTokenRepository, mailServices, configServices) {
+  constructor(userTokenRepository, mailServices) {
     this.userTokenRepository = userTokenRepository;
     this.mailServices = mailServices;
-    this.configServices = configServices;
   }
 
   async create(userId) {
-    const token = await this.get_token(userId);
+    const payload = {
+      userId, type: 'verification'
+    }
+    const token = jwtServices.encode(payload);
     const userToken = await this.userTokenRepository.create(userId, token);
     if (!userToken) {
       return { message: GeneralError.VerifyAccountError };
@@ -69,15 +73,8 @@ export class UserTokenService {
     return userToken;
   }
 
-  async get_token(userId) {
-    const secretKey = this.configServices.getJWTConfig().jwtSecret;
-    const expiresIn = this.configServices.getJWTConfig().expiresIn;
-    const payload = { userId, type: 'verification' };
-    const userToken = jwt.sign(payload, secretKey, { expiresIn });
-    return userToken;
-  }
 
-  async send_email(userToken, email) {
+  async sendEmail(userToken, email) {
     try {
       const subject = 'Verification Token';
       const text = `Please use this token below to active your account:\n${userToken}\n`;
