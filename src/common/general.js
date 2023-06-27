@@ -13,5 +13,5 @@ const GeneralMessage = {
     EmailSent: "Email sent, please check your email."
 }
 
-module.exports = { GeneralError, GeneralMessage };
+export { GeneralError, GeneralMessage };
 

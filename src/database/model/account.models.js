@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const userAccount = mongoose.Schema({
     username: {
@@ -36,6 +36,7 @@ const userAccount = mongoose.Schema({
         default: Date.now
     }
 });
+
 const User = mongoose.model("user_account", userAccount);
 
 const userToken = mongoose.Schema({
@@ -58,7 +59,7 @@ const userToken = mongoose.Schema({
 });
 const UserToken = mongoose.model("user_token", userToken)
 
-module.exports = {
+export {
     User,
     UserToken
 };

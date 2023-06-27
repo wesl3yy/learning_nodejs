@@ -1,7 +1,6 @@
-const { GeneralError, GeneralMessage } = require("../common/general");
+import { GeneralError, GeneralMessage } from "../common/general";
 
-
-class MailServices {
+export class MailServices {
   constructor(configServices, nodeMailer) {
     this.configServices = configServices;
     const { service, user, pass } = configServices.getEmailConfig();
@@ -27,5 +26,3 @@ class MailServices {
     })
   }
 }
-
-module.exports = MailServices;

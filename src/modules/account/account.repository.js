@@ -1,4 +1,4 @@
-class AccountRepository {
+export class AccountRepository {
   constructor(user) {
     this.user = user;
   }
@@ -10,22 +10,22 @@ class AccountRepository {
       email: email
     })
     const doc = await userModel.save();
-    return doc;
+    return doc
   }
 
-  async findOne(username){
+  async findOne(username) {
     const user = await this.user.findOne({ username: username });
     return user
   }
 
   async findUserAndUpdate(filter, user, options) {
     const updateUser = await this.user.findOneAndUpdate(filter, user, options);
-    return updateUser; 
+    return updateUser;
   };
 
 }
 
-class UserTokenRepository {
+export class UserTokenRepository {
   constructor(userToken) {
     this.userToken = userToken;
   }
@@ -40,4 +40,4 @@ class UserTokenRepository {
   }
 }
 
-module.exports = {AccountRepository, UserTokenRepository};
+

@@ -1,5 +1,3 @@
-require("dotenv").config({ path: "../.env" });
-
 class ConfigServices {
   constructor(env) {
     this.env = env;
@@ -37,5 +35,5 @@ class ConfigServices {
   }
 }
 
-const configServices = new ConfigServices(process.env);
-module.exports = configServices;
+export const configServices = new ConfigServices(process.env);
+

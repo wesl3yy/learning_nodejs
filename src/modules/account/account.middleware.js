@@ -1,22 +1,17 @@
+import { jwtServices } from "../../shared/jwt.services";
 
-const jwt = require("jsonwebtoken");
-const configServices = require("../../config");
-
-const jwt_secret = configServices.getJWTConfig().jwtSecret;
-
-// 1 function truyen vao err, req, res, next la 1 middleware
-const authenticateToken = (req, res, next) => {
+export function authMiddleware(req, res, next) {
   const token = req.headers['authorization'];
   if (!token) {
     return res.status(403).json({ message: "Authentication token is required" });
   }
-  jwt.verify(token, jwt_secret, (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: "Invalid token" });
-    }
+  const isValid = jwtServices.verify(token);
+  if (isValid) {
     req.user = decoded;
     next();
-  });
+  }
+  return res.status(403).json({ message: "Invalid token" });
 };
 
-module.exports = authenticateToken;
+
+
