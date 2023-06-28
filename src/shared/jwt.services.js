@@ -5,7 +5,7 @@ class JwtServices {
   secretKey = configServices.getJWTConfig().jwtSecret;
   expiresIn = configServices.getJWTConfig().expiresIn;
 
-  constructor(jwt, _secretKey, _expiresIn) {
+  constructor(jwt) {
     this.jwt = jwt;
   }
 
