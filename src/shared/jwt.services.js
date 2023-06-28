@@ -2,18 +2,18 @@ import jwt from 'jsonwebtoken';
 import { configServices } from '../config';
 
 class JwtServices {
-  constructor(jwt) {
-    this.jwt = jwt;
-  }
-
   secretKey = configServices.getJWTConfig().jwtSecret;
   expiresIn = configServices.getJWTConfig().expiresIn;
+
+  constructor(jwt, _secretKey, _expiresIn) {
+    this.jwt = jwt;
+  }
 
   /**
    * @returns { string }
    */
   encode(payload) {
-    const result = jwt.sign(payload, secretKey, { expiresIn });
+    const result = jwt.sign(payload, this.secretKey, { expiresIn: this.expiresIn });
     return result;
   }
 

@@ -3,7 +3,6 @@ import cors from 'cors';
 import NodeMailer from 'nodemailer';
 import { mongoConnect } from './database/db';
 import { MailServices } from './shared/mail.services';
-import { config } from 'dotenv';
 import { configServices } from './config';
 import { AccountRepository } from './modules/account/account.repository';
 import { AccountServices } from './modules/account/account.services';
@@ -14,7 +13,6 @@ import { User } from './database/model/account.models';
 import { UserToken } from './database/model/account.models';
 
 async function main() {
-    config();
     // INFO: connect database
     const database = mongoConnect(configServices.getMongoURI())
     database.on('error', (error) => {
