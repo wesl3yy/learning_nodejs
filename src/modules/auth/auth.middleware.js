@@ -1,4 +1,4 @@
-import { jwtServices } from "../../shared/jwt.services";
+import { jwtServices } from "../../shared/jwt.services.js";
 
 export function authMiddleware(req, res, next) {
   const token = req.headers['authorization'];

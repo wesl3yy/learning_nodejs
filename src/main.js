@@ -1,20 +1,18 @@
 import express from 'express';
 import cors from 'cors';
 import NodeMailer from 'nodemailer';
-import { mongoConnect } from './database/db';
-import { MailServices } from './shared/mail.services';
-import { config } from 'dotenv';
-import { configServices } from './config';
-import { AccountRepository } from './modules/account/account.repository';
-import { AccountServices } from './modules/account/account.services';
-import { AccountController } from './modules/account/account.controller';
-import { UserTokenRepository } from './modules/account/account.repository';
-import { UserTokenService } from './modules/account/account.services';
-import { User } from './database/model/account.models';
-import { UserToken } from './database/model/account.models';
+import { mongoConnect } from './database/db.js';
+import { MailServices } from './shared/mail.services.js';
+import { configServices } from './config.js';
+import { AccountRepository } from './modules/auth/auth.repository.js';
+import { AccountServices } from './modules/auth/auth.services.js';
+import { AccountController } from './modules/auth/auth.controller.js';
+import { UserTokenRepository } from './modules/auth/auth.repository.js';
+import { UserTokenService } from './modules/auth/auth.services.js';
+import { User } from './database/model/account.models.js';
+import { UserToken } from './database/model/account.models.js';
 
 async function main() {
-    config();
     // INFO: connect database
     const database = mongoConnect(configServices.getMongoURI())
     database.on('error', (error) => {

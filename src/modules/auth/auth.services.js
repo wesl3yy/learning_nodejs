@@ -1,7 +1,7 @@
-import { bcryptServices } from '../../shared/bcrypt.services';
-import { jwtServices } from '../../shared/jwt.services';
-import { GeneralError } from '../../common/general';
-import { AccountRepository } from './account.repository';
+import { bcryptServices } from '../../shared/bcrypt.services.js';
+import { jwtServices } from '../../shared/jwt.services.js';
+import { GeneralError } from '../../common/general.js';
+import { AccountRepository } from './auth.repository.js';
 
 export class AccountServices {
   /**
@@ -64,7 +64,7 @@ export class UserTokenService {
   async create(userId) {
     const payload = {
       userId, type: 'verification'
-    }
+    };
     const token = jwtServices.encode(payload);
     const userToken = await this.userTokenRepository.create(userId, token);
     if (!userToken) {

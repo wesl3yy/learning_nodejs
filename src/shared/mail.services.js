@@ -1,4 +1,4 @@
-import { GeneralError, GeneralMessage } from "../common/general";
+import { GeneralError, GeneralMessage } from "../common/general.js";
 
 export class MailServices {
   constructor(configServices, nodeMailer) {

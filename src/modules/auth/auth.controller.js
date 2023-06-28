@@ -1,8 +1,8 @@
 import express from 'express';
-import { authMiddleware } from './account.middleware';
-import { configServices } from '../../config';
-import { GeneralError, GeneralMessage } from '../../common/general';
-import { AccountServices, UserTokenService } from './account.services';
+import { authMiddleware } from './auth.middleware.js';
+import { configServices } from '../../config.js';
+import { GeneralError, GeneralMessage } from '../../common/general.js';
+import { AccountServices, UserTokenService } from './auth.services.js';
 
 /**
  * @param {AccountServices} accountServices 
@@ -49,8 +49,7 @@ export function AccountController(accountServices, userTokenService) {
   });
 
   router.use(authMiddleware);
-  router.put('/user/:username', async (req, res) => {
-    const username = req.params.username;
+  router.put('/user', async (req, res) => {
     const { fullname, dob, phone, gender, address } = req.body;
     try {
       const update = {
@@ -75,8 +74,13 @@ export function AccountController(accountServices, userTokenService) {
     }
   });
 
-  router.get('/user/:username', async (req, res) => {
-    const username = req.params.username;
+  router.use(authMiddleware);
+  router.get('/user', async (req, res) => {
+    const userToken = req.headers.authorization;
+    if (userToken) {
+      const token = userToken.split(" ");
+      console.log(token)
+    }
     try {
       const user = await accountServices.findOne(username);
       if (user.message == GeneralError.NotFound) {
@@ -88,7 +92,8 @@ export function AccountController(accountServices, userTokenService) {
     }
   });
 
-  router.put('/user/reset_password/:username', async (req, res) => {
+  router.use(authMiddleware);
+  router.put('/user/reset_password', async (req, res) => {
     const username = req.params.username;
     try {
       const { password, confirm_password } = req.body;
