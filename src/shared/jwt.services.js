@@ -24,7 +24,7 @@ class JwtServices {
   verify(token) {
     try {
       jwt.verify(token, this.secretKey);
-      return true;
+      return jwt.decode(token);
     } catch {
       return false;
     }

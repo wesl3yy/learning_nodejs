@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userAccount = mongoose.Schema({
+const user = mongoose.Schema({
     username: {
         type: String,
         unique: true,
@@ -34,32 +34,7 @@ const userAccount = mongoose.Schema({
     updated_at: {
         type: Date,
         default: Date.now
-    }
+    },
 });
 
-const User = mongoose.model("user_account", userAccount);
-
-const userToken = mongoose.Schema({
-    token: {
-        type: String,
-        unique: true,
-    },
-    user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "userAccount",
-    },
-    created_at: {
-        type: Date,
-        default: Date.now
-    },
-    updated_at: {
-        type: Date,
-        default: Date.now
-    }
-});
-const UserToken = mongoose.model("user_token", userToken)
-
-export {
-    User,
-    UserToken
-};
+export const User = mongoose.model("user", user);
