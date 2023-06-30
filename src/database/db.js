@@ -9,3 +9,7 @@ export function mongoConnect(url) {
     const database = mongoose.connection;
     return database;
 }
+
+export const MongoErrorCodes = {
+    Duplicate: 11000
+};

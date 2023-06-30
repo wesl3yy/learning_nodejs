@@ -1,3 +1,6 @@
+import { config } from 'dotenv';
+config();
+
 class ConfigServices {
   constructor(env) {
     this.env = env;
