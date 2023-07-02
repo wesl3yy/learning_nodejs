@@ -34,6 +34,11 @@ export class UserRepository {
     return user
   }
 
+  async findByEmail(email) {
+    const user = await this.user.findOne({ email });
+    return user
+  }
+
   async findUserAndUpdate(filter, user, options) {
     try {
       const updateUser = await this.user.findOneAndUpdate(filter, user, options);
@@ -46,4 +51,12 @@ export class UserRepository {
       }
     }
   };
+
+  async update(user) {
+    try {
+      await this.user.findOneAndUpdate({ _id: user.id }, user);
+    } catch (e) {
+      throw e;
+    }
+  }
 }

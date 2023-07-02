@@ -1,6 +1,7 @@
+import NodeMailer from 'nodemailer';
 import { GeneralError, GeneralMessage } from "../common/general";
-
-export class MailServices {
+import { configServices } from "../config";
+class MailServices {
   constructor(configServices, nodeMailer) {
     this.configServices = configServices;
     const { service, user, pass } = configServices.getEmailConfig();
@@ -26,3 +27,5 @@ export class MailServices {
     })
   }
 }
+
+export const mailServices = new MailServices(configServices, NodeMailer);

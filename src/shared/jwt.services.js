@@ -18,7 +18,7 @@ class JwtServices {
   }
 
   /**
-   * 
+   * @param {string} token 
    * @returns { boolean }
    */
   verify(token) {

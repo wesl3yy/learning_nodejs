@@ -32,8 +32,20 @@ export class UserServices {
     return user;
   }
 
+  async findByEmail(email) {
+    const user = await this.userRepository.findByEmail(email);
+    if (!user) {
+      throw GeneralError.NotFound;
+    }
+    return user;
+  }
+
   async findUserAndUpdate(filter, user, options) {
     const userUpdate = await this.userRepository.findUserAndUpdate(filter, user, options);
     return userUpdate;
+  }
+
+  async update(user) {
+    await this.userRepository.update(user);
   }
 }

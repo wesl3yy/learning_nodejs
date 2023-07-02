@@ -21,7 +21,7 @@ const user = mongoose.Schema({
     fullName: String,
     dob: String,
     phone: String,
-    gender: String,
+    gender: Number,
     address: String,
     is_active: {
         type: Boolean,

@@ -1,11 +1,10 @@
-import { GeneralError } from "../../common/general";
 import { jwtServices } from "../../shared/jwt.services";
 import { UserServices } from "../user/user.services";
 
 /**
  * @param {UserServices} userServices 
  */
-export function authMiddleware(userServices) {
+export function AuthMiddleware(userServices) {
   return async (req, res, next) => {
     const token = req.headers['authorization'];
     if (!token) {
